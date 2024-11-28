@@ -1,7 +1,8 @@
 from typing import Dict
 from toolz import curry
 from app.db.models import Location, Device, Interaction
-from app.repository.phone_repository import create_device_interaction
+from app.repository.phone_repository import create_device_interaction, relationship_exists
+
 
 @curry
 def validate_device_data(device_data: Dict) -> bool:
@@ -38,9 +39,11 @@ def parse_interaction(interaction_data: Dict) -> Interaction:
         timestamp=interaction_data['timestamp']
     )
 
+
 def process_device_interaction(data: Dict) -> Dict:
     if not isinstance(data, dict):
         raise ValueError("Invalid data format. Expected a dictionary.")
+
     devices = data.get('devices', [])
     interaction = data.get('interaction', {})
 
@@ -49,5 +52,11 @@ def process_device_interaction(data: Dict) -> Dict:
 
     parsed_devices = list(map(parse_device, devices))
     parsed_interaction = parse_interaction(interaction)
+
+    if parsed_interaction.from_device == parsed_interaction.to_device:
+        raise ValueError("A device cannot create a relationship with itself.")
+
+    if relationship_exists(parsed_interaction):
+        raise ValueError("A relationship with the same timestamp already exists.")
 
     return create_device_interaction(parsed_devices, parsed_interaction)

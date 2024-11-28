@@ -3,51 +3,20 @@ from toolz import curry, pipe
 from app.db.database import driver
 from app.db.models import Device, Interaction
 
-# def create_device_and_interaction(data: dict):
-#     with driver.session() as session:
-#         devices = data.get('devices', [])
-#         interaction = data.get('interaction', {})
-#
-#         query = """
-#         UNWIND $devices AS device
-#         MERGE (d:Device {id: device.id})
-#         ON CREATE SET
-#             d.brand = device.brand,
-#             d.model = device.model,
-#             d.name = device.name,
-#             d.os = device.os,
-#             d.latitude = device.location.latitude,
-#             d.longitude = device.location.longitude,
-#             d.altitude = device.location.altitude_meters,
-#             d.accuracy = device.location.accuracy_meters
-#
-#         WITH device, d
-#         MATCH (from:Device {id: $from_device}), (to:Device {id: $to_device})
-#         MERGE (from)-[r:CONNECTED {
-#             method: $method,
-#             bluetooth_version: $bluetooth_version,
-#             signal_strength_dbm: $signal_strength_dbm,
-#             distance_meters: $distance_meters,
-#             duration_seconds: $duration_seconds,
-#             timestamp: $timestamp
-#         }]->(to)
-#         RETURN d
-#         """
-#
-#         params = {
-#             "devices": devices,
-#             "from_device": interaction.get('from_device'),
-#             "to_device": interaction.get('to_device'),
-#             "method": interaction.get('method'),
-#             "bluetooth_version": interaction.get('bluetooth_version'),
-#             "signal_strength_dbm": interaction.get('signal_strength_dbm'),
-#             "distance_meters": interaction.get('distance_meters'),
-#             "duration_seconds": interaction.get('duration_seconds'),
-#             "timestamp": interaction.get('timestamp')
-#         }
-#
-#         session.run(query, params)
-#         return {"status": "Interaction recorded"}
+def relationship_exists(interaction: Interaction) -> bool:
+    query = """
+    MATCH (from:Device {id: $from_device})-[r:CONNECTED {timestamp: $timestamp}]->(to:Device {id: $to_device})
+    RETURN count(r) > 0 AS exists
+    """
+    params = {
+        "from_device": interaction.from_device,
+        "to_device": interaction.to_device,
+        "timestamp": interaction.timestamp,
+    }
+
+    with driver.session() as session:
+        result = session.run(query, params).single()
+        return result["exists"]
 
 @curry
 def create_cypher_params(devices: List[Device], interaction: Interaction) -> Dict:
