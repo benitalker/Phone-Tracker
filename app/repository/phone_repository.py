@@ -147,8 +147,6 @@ def find_bluetooth_connections():
             } for record in result
         ]
 
-
-
 def find_strong_signal_connections():
     with driver.session() as session:
         query = """

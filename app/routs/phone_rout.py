@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from app.repository.phone_repository import create_device_and_interaction, find_bluetooth_connections, \
-    find_strong_signal_connections
+    find_strong_signal_connections, count_device_connections
 
 phone_blueprint = Blueprint("phone", __name__)
 
@@ -26,12 +26,12 @@ def get_strong_signal_connections():
     connections = find_strong_signal_connections()
     return jsonify(connections), 200
 
-# @phone_blueprint.route("/api/device/<device_id>/connection-count", methods=['GET'])
-# def get_device_connection_count(device_id):
-#     count = count_device_connections(device_id)
-#     return jsonify({"device_id": device_id, "connection_count": count}), 200
-#
-#
+@phone_blueprint.route("/connection-count/<device_id>", methods=['GET'])
+def get_device_connection_count(device_id):
+    print(device_id)
+    count = count_device_connections(device_id)
+    return jsonify({"device_id": device_id, "connection_count": count}), 200
+
 # @phone_blueprint.route("/api/connection/direct", methods=['GET'])
 # def check_connection():
 #     device1_id = request.args.get('device1')
