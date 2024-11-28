@@ -129,11 +129,14 @@ def create_device_and_interaction(data: dict):
 def find_bluetooth_connections():
     with driver.session() as session:
         query = """
-        MATCH path = (d1:Device)-[r:CONNECTED {method: 'Bluetooth'}]->(d2:Device)
+        MATCH path = (d1:Device)-[r:CONNECTED*]->(d2:Device)
+        WHERE all(rel IN r WHERE rel.method = 'Bluetooth')
         RETURN 
             d1.id AS from_device, 
             d2.id AS to_device, 
             length(path) AS path_length
+        ORDER BY length(path) DESC
+        LIMIT 1
         """
         result = session.run(query)
         return [
@@ -143,6 +146,8 @@ def find_bluetooth_connections():
                 "path_length": record["path_length"]
             } for record in result
         ]
+
+
 
 def find_strong_signal_connections():
     with driver.session() as session:
@@ -163,15 +168,15 @@ def find_strong_signal_connections():
             } for record in result
         ]
 
-# def count_device_connections(device_id):
-#     with driver.session() as session:
-#         query = """
-#         MATCH (d:Device {id: $device_id})-[r:CONNECTED]->()
-#         RETURN count(r) AS connection_count
-#         """
-#         result = session.run(query, {"device_id": device_id}).single()
-#         return result["connection_count"] if result else 0
-#
+def count_device_connections(device_id):
+    with driver.session() as session:
+        query = """
+        MATCH (d:Device {id: $device_id})-[r:CONNECTED]->()
+        RETURN count(r) AS connection_count
+        """
+        result = session.run(query, {"device_id": device_id}).single()
+        return result["connection_count"] if result else 0
+
 # def check_direct_connection(device1_id, device2_id):
 #     with driver.session() as session:
 #         query = """
