@@ -143,26 +143,26 @@ def find_bluetooth_connections():
                 "path_length": record["path_length"]
             } for record in result
         ]
-#
-# def find_strong_signal_connections():
-#     with driver.session() as session:
-#         query = """
-#         MATCH path = (d1:Device)-[r:CONNECTED]->(d2:Device)
-#         WHERE r.signal_strength_dbm > -60
-#         RETURN
-#             d1.id AS from_device,
-#             d2.id AS to_device,
-#             r.signal_strength_dbm AS signal_strength
-#         """
-#         result = session.run(query)
-#         return [
-#             {
-#                 "from_device": record["from_device"],
-#                 "to_device": record["to_device"],
-#                 "signal_strength": record["signal_strength"]
-#             } for record in result
-#         ]
-#
+
+def find_strong_signal_connections():
+    with driver.session() as session:
+        query = """
+        MATCH path = (d1:Device)-[r:CONNECTED]->(d2:Device)
+        WHERE r.signal_strength_dbm > -60
+        RETURN
+            d1.id AS from_device,
+            d2.id AS to_device,
+            r.signal_strength_dbm AS signal_strength
+        """
+        result = session.run(query)
+        return [
+            {
+                "from_device": record["from_device"],
+                "to_device": record["to_device"],
+                "signal_strength": record["signal_strength"]
+            } for record in result
+        ]
+
 # def count_device_connections(device_id):
 #     with driver.session() as session:
 #         query = """

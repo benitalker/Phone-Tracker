@@ -1,9 +1,10 @@
 from flask import Blueprint, jsonify, request
-from app.repository.phone_repository import create_device_and_interaction, find_bluetooth_connections
+from app.repository.phone_repository import create_device_and_interaction, find_bluetooth_connections, \
+    find_strong_signal_connections
 
 phone_blueprint = Blueprint("phone", __name__)
 
-@phone_blueprint.route("/api/phone_tracker", methods=['POST'])
+@phone_blueprint.route("/phone_tracker", methods=['POST'])
 def get_interaction():
     try:
         data = request.json
@@ -15,18 +16,16 @@ def get_interaction():
         print(f"Error processing interaction: {str(e)}")
         return jsonify({"error": "Failed to process interaction"}), 400
 
-@phone_blueprint.route("/api/connections/bluetooth", methods=['GET'])
+@phone_blueprint.route("/bluetooth", methods=['GET'])
 def get_bluetooth_connections():
     connections = find_bluetooth_connections()
     return jsonify(connections), 200
 
+@phone_blueprint.route("/strong-signal", methods=['GET'])
+def get_strong_signal_connections():
+    connections = find_strong_signal_connections()
+    return jsonify(connections), 200
 
-# @phone_blueprint.route("/api/connections/strong-signal", methods=['GET'])
-# def get_strong_signal_connections():
-#     connections = find_strong_signal_connections()
-#     return jsonify(connections), 200
-#
-#
 # @phone_blueprint.route("/api/device/<device_id>/connection-count", methods=['GET'])
 # def get_device_connection_count(device_id):
 #     count = count_device_connections(device_id)
