@@ -1,7 +1,7 @@
 import uuid
 from returns.maybe import Maybe
 from app.db.database import driver
-from app.db.models import Device, Location, Interaction
+from app.db.models import Device, Interaction
 
 def create_device_and_interaction(data: dict):
     with driver.session() as session:
@@ -23,7 +23,7 @@ def create_device_and_interaction(data: dict):
 
         WITH device, d
         MATCH (from:Device {id: $from_device}), (to:Device {id: $to_device})
-        CREATE (from)-[r:CONNECTED {
+        MERGE (from)-[r:CONNECTED {
             method: $method,
             bluetooth_version: $bluetooth_version,
             signal_strength_dbm: $signal_strength_dbm,

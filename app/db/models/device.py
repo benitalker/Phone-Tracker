@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import uuid
 from typing import Optional
-from app.db.models import Location
+from .location import Location
 
 @dataclass
 class Device:
