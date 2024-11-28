@@ -175,18 +175,18 @@ def count_device_connections(device_id):
         result = session.run(query, {"device_id": device_id}).single()
         return result["connection_count"] if result else 0
 
-# def check_direct_connection(device1_id, device2_id):
-#     with driver.session() as session:
-#         query = """
-#         MATCH (d1:Device {id: $device1_id})-[r:CONNECTED]->(d2:Device {id: $device2_id})
-#         RETURN count(r) > 0 AS is_connected
-#         """
-#         result = session.run(query, {
-#             "device1_id": device1_id,
-#             "device2_id": device2_id
-#         }).single()
-#         return result["is_connected"] if result else False
-#
+def check_direct_connection(device1_id, device2_id):
+    with driver.session() as session:
+        query = """
+        MATCH (d1:Device {id: $device1_id})-[r:CONNECTED]->(d2:Device {id: $device2_id})
+        RETURN count(r) > 0 AS is_connected
+        """
+        result = session.run(query, {
+            "device1_id": device1_id,
+            "device2_id": device2_id
+        }).single()
+        return result["is_connected"] if result else False
+
 # def get_most_recent_interaction(device_id):
 #     with driver.session() as session:
 #         query = """

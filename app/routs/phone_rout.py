@@ -1,6 +1,6 @@
 from flask import Blueprint, jsonify, request
 from app.repository.phone_repository import create_device_and_interaction, find_bluetooth_connections, \
-    find_strong_signal_connections, count_device_connections
+    find_strong_signal_connections, count_device_connections, check_direct_connection
 
 phone_blueprint = Blueprint("phone", __name__)
 
@@ -32,22 +32,22 @@ def get_device_connection_count(device_id):
     count = count_device_connections(device_id)
     return jsonify({"device_id": device_id, "connection_count": count}), 200
 
-# @phone_blueprint.route("/api/connection/direct", methods=['GET'])
-# def check_connection():
-#     device1_id = request.args.get('device1')
-#     device2_id = request.args.get('device2')
-#
-#     if not device1_id or not device2_id:
-#         return jsonify({"error": "Both device IDs are required"}), 400
-#
-#     is_connected = check_direct_connection(device1_id, device2_id)
-#     return jsonify({
-#         "device1": device1_id,
-#         "device2": device2_id,
-#         "is_connected": is_connected
-#     }), 200
-#
-#
+@phone_blueprint.route("/direct-connection", methods=['GET'])
+def check_connection():
+    data = request.json
+    if not data:
+        return jsonify({"error": "Invalid JSON data provided"}), 400
+    device1_id = data["device1"]
+    device2_id = data["device2"]
+    if not device1_id or not device2_id:
+        return jsonify({"error": "Both device IDs are required"}), 400
+    is_connected = check_direct_connection(device1_id, device2_id)
+    return jsonify({
+        "device1": device1_id,
+        "device2": device2_id,
+        "is_connected": is_connected
+    }), 200
+
 # @phone_blueprint.route("/api/device/<device_id>/last-interaction", methods=['GET'])
 # def get_last_interaction(device_id):
 #     interaction = get_most_recent_interaction(device_id)
